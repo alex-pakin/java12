@@ -9,7 +9,19 @@ public class ProductRepository {
         return products;
     }
 
+    public Product findById(int id) {
+        for (Product product : products) {
+            if(product.getId() == id) {
+                return product;
+            }
+        }
+        return null;
+    }
+
     public void save(Product product) {
+        if(findById(product.getId()) != null) {
+            throw new AlreadyExistsException("Элемент с таким id: " + product + " уже существует в базе");
+        }
         int length = products.length +1;
         Product[] tmp = new Product[length];
         System.arraycopy(products,0,tmp,0,products.length);
@@ -19,14 +31,14 @@ public class ProductRepository {
     }
 
     public void removeById(int id) {
+        if (findById(id) == null) {
+            throw new NotFoundException("Не найден элемент с id: " + id);
+        }
         int length = products.length - 1;
         Product[] tmp = new Product[length];
         int index = 0;
         for (Product product : products) {
             if (product.getId() != id) {
-                if (index +1 == products.length) {
-                    return;
-                }
                 tmp[index] = product;
                 index++;
             }
